@@ -35,14 +35,14 @@
                       </div>
                       <div class="col-12 col-md-2">
                         <select v-model="BuscarHabitaciones" class="form-select" id="example-select" name="example-select">
-                          <option value="0">Habitaciones</option>
+                          <option value="">Habitaciones</option>
                           
                               <option value="1">1</option>
                               <option value="2">2</option>
                               <option value="3">3</option>
                         </select>
                       </div>
-
+                      
                       <div class="col-12 col-md-3">
                         <input class="form-control" type="date" onkeydown="return false"  @bind="FechaMinima">
                     </div>
@@ -57,24 +57,25 @@
                         <h4 class="block-title ms-4">Estado:</h4>
                         <div class="form-check  form-check-inline">
                           <label class="ms-1">Usada</label>
-                        <input type="checkbox"  class="ms-1"  v-model="filterUsado"/> 
+                        <input type="checkbox"  class="ms-1" v-on:click="filterEnConstruccion=0 ; filterNueva=0"  v-model="filterUsado"/> 
                         <label class="ms-2">Construncción</label>
-                        <input class="ms-1" type="checkbox" v-model="filterEnConstruccion"/>
+                        <input class="ms-1" type="checkbox"  v-on:click="filterUsado=0;filterNueva=0;"  v-model="filterEnConstruccion"/>
                     
                         <label class="ms-2">Nueva</label>
-                        <input type="checkbox" v-model="filterNueva"/>
+                        <input type="checkbox"  v-on:click="filterEnConstruccion=0 ; filterUsado=0"  v-model="filterNueva"/>
                         </div>
                       </div>
                       <div class="col-12 col-md-2">
-                        <h4 class="block-title ms-4">Nº Baños:</h4>
+                       
                         <div class="form-check  form-check-inline">
-                        <label class="ms-1">1</label>
-                        <input class="ms-1" type="checkbox" v-model="filterFieldInactive"/>
-                        <label class="ms-3">2</label>
-                        <input class="ms-1" type="checkbox" v-model="filterFieldActive"/>
-                    
-                        <label class="ms-3">más de 2</label>
-                        <input class="ms-1" type="checkbox" v-model="filterFieldActives"/>
+                       
+                          <select v-model="BuscarBannos" class="form-select" id="example-select" name="example-select">
+                            <option value="">Baños</option>
+                            
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3 o más</option>
+                          </select>
                         </div>
                       </div>
                     
@@ -95,11 +96,12 @@
                         <input type="text" class="form-control" placeholder="Parking">
                       </div>
                       <div class="col-12 col-md-2">
-                        <select v-model="Operaciones" class="form-select" id="example-select" >
+                        <select v-model="filterDivisa" class="form-select" id="example-select" >
                           <option value="0">Divisa</option>
                           
                               <option value="1"> US$ </option>
                               <option value="2"> EU€ </option>
+                              <option value="3"> RD€ </option>
                         </select>
                       </div>
                     </div>
@@ -112,7 +114,7 @@
               </div>
             
             
-      
+     
           <!-- END Checkable Table -->
 
           <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
@@ -149,7 +151,7 @@
                   </tr>
                 </thead>
                 
-                <tbody v-show="filter(post)"  v-for="post in  datosPaginados" :key="post" class="js-table-sections">
+                <tbody v-show="filter(post)" v-for="post in  posts" :key="post.anuncio" class="js-table-sections">
               
                   <tr>
                     <td class="text-center">
@@ -175,7 +177,7 @@
                   <template id="datosExtra" v-if="Active==post.anuncio">
                   <tr>
                    
-                    <td class="fw-semibold "></td>
+                    <td class="fw-semibold ">Aseos:<br/> {{post.bannos}}</td>
                     <td class="d-none d-sm-table-cell fw-semibold"> 
                       Uso :
                       <span v-if="post.uso!=''" class=" text-muted"> {{post.uso}}</span>
@@ -203,7 +205,7 @@
                     <td></td>
                     <td colspan="5" class="text-justify  d-sm-table-cell">
                       <span class="fw-semibold">Información Detallada:</span>
-                      {{post.obser}}
+                      {{post.obser}} ...Estado :{{post.estado}}
                     </td>
                     <td></td>
                     <td></td>
@@ -216,7 +218,7 @@
              
               </table>
 
-              <nav aria-label="..." >
+              <!-- <nav aria-label="..." >
             <ul class="pagination">
               <li class="page-item ">
                 <a class="page-link"  v-on:click="getPreviousPage()" href="#" >Previous</a>
@@ -231,7 +233,7 @@
                 <a class="page-link"  v-on:click="getNextPage()" href="#">Next</a>
               </li>
             </ul>
-          </nav>
+          </nav> -->
             </div>
             
           </div>
@@ -245,7 +247,6 @@
 <script>
 import navvv from '@/components/Nav.vue'
 import axios from "axios";
-import { loadScript } from "vue-plugin-load-script";
 export default {
   name: 'PageN',
   components: {
@@ -255,19 +256,17 @@ export default {
         posts:[],
         filterField:'',
         Active:'',
-        BuscarHabitaciones:0,
-        BuscarBannos:0,
+        BuscarHabitaciones:'',
+        BuscarBannos:'',
         BuscarTipo:0,
-        filterFieldActive:0,
-        filterFieldInactive:0,
-        filterFieldInactives:0,
         filterUsado:0, //Segundo Uso o Usado ?
         filterEnConstruccion:0, //En construcción
         filterNueva:0,
         Operaciones:0,
-        elementosPorPagina:30,
-        datosPaginados:[],
-        paginaActual:1
+        filterDivisa:0
+        // elementosPorPagina:30,
+        // datosPaginados:[],
+        // paginaActual:1
       }
   },methods:{
     filter(post){
@@ -277,16 +276,21 @@ export default {
       && this.filterNueva==0 && this.filterField==''){
         show=true;
        
+      }else if((post.tipo!=this.BuscarTipo && this.BuscarTipo)){
+        show=false;
       }
-      else if((post.estado!='Usado' && this.filterUsado)||(post.estado!='En construcción' && this.filterEnConstruccion)||(post.estado!='Nueva' && this.filterNueva)
-      ||post.tipo.toLocaleLowerCase().indexOf(this.BuscarTipo) <0
-      ||post.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones)<0
-      ||post.anuncio.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase()) <0
-     /* ||post.nombre.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase()) <0*/){
+      else if((post.anuncio.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase())<0)
+      ||(post.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)<0)
+      ||post.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())<0 
+      ||(post.estado!='Usado' && this.filterUsado)||(post.estado!='En construcción' && this.filterEnConstruccion)||(post.estado!='Nueva' && this.filterNueva)){
         show=false
       }
-   
-      return show
+       return show;
+      
+     /*  return this.datosPaginados= post.filter(casas => casas.anuncio.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase())>-1 
+      || casas.nombre.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase())>-1 
+      || casas.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toString().toLocaleLowerCase())>-1
+      || casas.tipo.toLocaleLowerCase().indexOf(this.BuscarTipo.toString())>-1) */
       //console.log(post.nombre+""+ this.filterField);
       //return ((post.nombre.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase()) > -1 ||post.anuncio.toLocaleLowerCase().indexOf(this.filterField.toLocaleLowerCase()) >-1)); 
        //|| post.tipo.toLocaleLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase()) > -1 || post.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase()>0));
@@ -297,7 +301,7 @@ export default {
       }else{ this.Active=post;}
       
        console.log(this.Active+"");
-    },
+    }/* ,
 
     totalPaginas(){
       return Math.ceil(this.posts.length /this.elementosPorPagina)
@@ -309,7 +313,13 @@ export default {
       let fin=(noPagina* this.elementosPorPagina);
      
        
-        this.datosPaginados= this.posts.slice(ini,fin);
+       this.datosPaginados= this.posts.slice(ini,fin);
+     for (let index = 0; index < this.datosPaginados.length; index++) {
+      var element = this.datosPaginados[index];
+      console.log(element+"");
+     }
+      
+      
     },
     getPreviousPage(){
       if(this.paginaActual > 1){
@@ -322,7 +332,7 @@ export default {
         this.paginaActual++;
       }
       this.getDataPagina(this.paginaActual);
-    }
+    }  */
   },
   async created(){
 
@@ -341,9 +351,9 @@ export default {
       }); 
   
 },
-  async mounted(){
-    this.getDataPagina(1);
-    
+    mounted(){
+
+   // this.getDataPagina(1);
   }
 }
 </script>
