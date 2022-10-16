@@ -175,11 +175,8 @@
               </td>
               <td  >
                
-                <span class="badge bg-primary" v-if="post.nombre.toLocaleLowerCase().indexOf(parametros.zonas[0].zona.toLocaleLowerCase())>1">La Esperilla</span>
-                <span class="badge bg-primary" v-else-if="post.nombre.toLocaleLowerCase().indexOf(parametros.zonas[1].zona.toLocaleLowerCase())>1">La Julia</span>
-                <span class="badge bg-primary" v-else-if="post.nombre.toLocaleLowerCase().indexOf(parametros.zonas[2].zona.toLocaleLowerCase())>1">Naco</span>
-                <span class="badge bg-primary" v-else-if="post.nombre.toLocaleLowerCase().indexOf(parametros.zonas[3].zona.toLocaleLowerCase())>1">Paraiso</span>
-                <span class="badge bg-primary" v-else-if="post.nombre.toLocaleLowerCase().indexOf(parametros.zonas[4].zona.toLocaleLowerCase())>1">Piantini</span>
+                <span class="badge bg-primary">{{this.typeZone(post)}}</span>
+          
               
               </td>
               <td class="d-none d-sm-table-cell">
@@ -348,7 +345,12 @@ return{
   // datosPaginados:[],
   // paginaActual:1
 }
-},methods:{
+},
+computed:{
+  
+  
+},
+methods:{
 filter(post){
 var show=true;
 //console.log(this.precio !="" && eval(parseInt(this.precio) + this.operacionesPrecio+parseInt(post.precio2)));
@@ -386,7 +388,19 @@ if(this.Active==post){
 }else{ this.Active=post;}
 
  console.log(this.Active+"");
-}/* ,
+},
+
+typeZone(post){
+      
+      for (let index = 0; index < this.parametros.zonas.length; index++) {
+   
+        if(post.nombre.toLocaleLowerCase().indexOf(this.parametros.zonas[index].zona.toLocaleLowerCase())>-1){
+          
+          return this.parametros.zonas[index].zona;
+        }
+      }
+      return "0";
+    },/* ,
 
 totalPaginas(){
 return Math.ceil(this.posts.length /this.elementosPorPagina)
@@ -417,7 +431,7 @@ if(this.paginaActual < this.totalPaginas()){
   this.paginaActual++;
 }
 this.getDataPagina(this.paginaActual);
-}  */,
+}  */
 resetFilter(){
   this.filterField='',
   this.Active='',
