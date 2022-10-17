@@ -93,15 +93,17 @@
                          
                     </select>
                   </div>
-                    <input v-model="precio" type="text" class="form-control" placeholder="Precio"/>
+                    <input v-model="precio" type="number" class="form-control" placeholder="Precio"/>
                   </div>
                 </div>
                 <div class="col-12 col-md-2">
                   <select v-model="zona" class="form-select" id="example-select" >
                     <option value="">Zona</option>
                       <option v-for="parametro in parametros.zonas" :key="parametro" :value="parametro.zona">{{parametro.zona}}</option>
-                         
+                       
                     </select>
+                    <!--
+                    <input  v-on:click="getDataPagina(this.paginaActual)" type="button"  class="btn btn-secondary col-md-12  mt-3" value="Buscar"/>-->
                 </div>
                 <div class="col-12 col-md-2">
                   <select v-model="filterDivisa" class="form-select" id="example-select" >
@@ -113,6 +115,7 @@
                   </select>
 
                   <input  v-on:click="resetFilter()" type="button"  class="btn btn-danger col-md-12  mt-3" value="Reset"/>
+                  
                 </div>
                 
               </div>
@@ -164,7 +167,7 @@
             </tr>
           </thead>
           
-          <tbody  v-for="post in  filterArray" :key="post.anuncio" class="js-table-sections">
+          <tbody  v-for="post in  datosPaginados" :key="post.anuncio" class="js-table-sections">
         
             <tr>
               <td class="text-center">
@@ -267,8 +270,8 @@
              </td>
              <td class="fw-semibold ">
                Cambios : <br/>
-               <span v-if="post.parking!=''" class=" text-muted"> {{post.parking}}</span>
-               <span v-else class=" text-muted"> Indefinido</span>
+               <span  class=" text-muted"> {{this.typeState(post)}}</span>
+               
              </td>
            </tr>
 
@@ -291,22 +294,42 @@
        
         </table>
 
-        <!-- <nav aria-label="..." >
+         <nav aria-label="..." >
       <ul class="pagination">
+        
+       
+        <li v-on:click="getDataPagina(1)" class="page-item"
+        :class="{active: paginaActual==1}" aria-current="page">
+          <a class="page-link" href="#">|&lt;&lt;</a>
+        </li>
         <li class="page-item ">
           <a class="page-link"  v-on:click="getPreviousPage()" href="#" >Previous</a>
         </li>
-       
-        <li v-for="pagina in totalPaginas()" :key="pagina" v-on:click="getDataPagina(pagina)" class="page-item"
+        <li v-on:click="getDataPagina(paginaActual)" class="page-item"
         :class="{active: paginaActual==pagina}" aria-current="page">
-          <a class="page-link" href="#">{{pagina}}</a>
+          <a class="page-link" href="#">{{this.paginaActual}}</a>
         </li>
-     
+        <li v-on:click="getDataPagina(paginaActual+1)" class="page-item"
+        :class="{active: paginaActual==pagina}" aria-current="page">
+          <a class="page-link" href="#"  v-if="paginaActual==totalPaginas()">{{this.paginaActual-1}}</a>
+          <a class="page-link" href="#"  v-else>{{this.paginaActual+1}}</a>
+        </li>
+        <li v-on:click="paginaActual==totalPaginas()?getDataPagina(paginaActual-2):getDataPagina(paginaActual+2)" class="page-item"
+        :class="{active: paginaActual==pagina}" aria-current="page">
+          <a class="page-link" href="#" v-if="paginaActual==totalPaginas()">{{this.paginaActual-2}}</a>
+          <a class="page-link" href="#"  v-else>{{this.paginaActual+2}}</a>
+        </li>
         <li class="page-item">
           <a class="page-link"  v-on:click="getNextPage()" href="#">Next</a>
         </li>
+        <li v-on:click="getDataPagina(this.totalPaginas())" class="page-item"
+        :class="{active: paginaActual==totalPaginas()}" aria-current="page">
+          <a class="page-link" href="#">>>|</a>
+        </li>
+     
+       
       </ul>
-    </nav> -->
+    </nav> 
       </div>
       
     </div>
@@ -342,29 +365,30 @@ return{
   filterEnConstruccion:0, //En construcción
   filterNueva:0,
   filterUsada:0,
-  operacionesPrecio:">=",
-  precio:'',
+  operacionesPrecio:"<=",
+  precio:0,
   filterDivisa:'',
-  zona:''
-  // elementosPorPagina:30,
-  // datosPaginados:[],
-  // paginaActual:1
+  zona:'',
+  elementosPorPagina:30,
+  datosPaginados:[],
+   paginaActual:1
 }
 },
 computed:{
   
   filterArray(){
+    
     this.posts2=this.posts;
-
+   
      return this.posts2.filter((item)=>{
       return (item.anuncio.toLowerCase().indexOf(this.filterField.toLowerCase())>-1)&&
       (item.tipo.toLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase())>-1)&&
       item.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1 &&
       (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
-      (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) ||
-      (((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
-      ||((item.estado=='Segundo Uso') && this.filterUsada)) ||eval(parseInt(this.precio) + this.operacionesPrecio+ parseInt(item.precio2));
+      (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
+      (item.estado==''||((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
+      ||((item.estado=='Segundo Uso') && this.filterUsada)) && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2));
       
     }) ;
   
@@ -438,8 +462,19 @@ typeZone(post){
           return this.parametros.zonas[index].zona;
         }
       }
-      return "0";
-    },/* ,
+      return "Indefinido";
+    },
+    typeState(post){
+      
+      for (let index = 0; index < this.parametros.estados.length; index++) {
+   
+        if(post.cambios[0].estado.toLocaleLowerCase().indexOf(this.parametros.estados[index].nombre.toLocaleLowerCase())>-1){
+          
+          return this.parametros.estados[index].nombre;
+        }
+      }
+      return "Indefinido";
+    },
 
 totalPaginas(){
 return Math.ceil(this.posts.length /this.elementosPorPagina)
@@ -451,7 +486,7 @@ let ini=(noPagina * this.elementosPorPagina) -this.elementosPorPagina;
 let fin=(noPagina* this.elementosPorPagina);
 
  
- this.datosPaginados= this.posts.slice(ini,fin);
+ this.datosPaginados= this.filterArray.slice(ini,fin);
 for (let index = 0; index < this.datosPaginados.length; index++) {
 var element = this.datosPaginados[index];
 console.log(element+"");
@@ -470,7 +505,7 @@ if(this.paginaActual < this.totalPaginas()){
   this.paginaActual++;
 }
 this.getDataPagina(this.paginaActual);
-}  */
+} ,
 resetFilter(){
   this.filterField='',
   this.Active='',
@@ -480,8 +515,8 @@ resetFilter(){
   this.filterUsado=0; //Segundo Uso o Usado ?
   this.filterEnConstruccion=0, //En construcción
   this.filterNueva=0,
-  this.operacionesPrecio=">=",
-  this.precio='',
+  this.operacionesPrecio="<=",
+  this.precio=0,
   this.filterDivisa='',
   this.zona=''
 },
@@ -543,9 +578,9 @@ headers: {
 }); 
 
 },
-mounted(){
+beforeUpdate(){
 
-// this.getDataPagina(1);
+ this.getDataPagina(this.paginaActual);
 }
 }
 </script>
