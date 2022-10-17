@@ -129,7 +129,8 @@
     <!-- END Checkable Table -->
 
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
-    <h2 class="content-heading">Table Sections</h2>
+    <h2 class="content-heading"> <button class="btn btn-success" @click.prevent = "downloadExl"> Export to Excel </button></h2>  
+
     <div class="block block-rounded">
       <div class="block-header block-header-default">
         <h3 class="block-title">
@@ -150,7 +151,7 @@
 
         You can also add the class .show in your tbody.js-table-sections-header to make the next tbody section visible by default
         -->
-        <table class="js-table-sections table table-hover">
+        <table id="excel" class="js-table-sections table table-hover">
           <thead>
             <tr>
               <th class="text-center" style="width: 10%;">#</th>
@@ -163,11 +164,11 @@
             </tr>
           </thead>
           
-          <tbody v-show="filter(post)" v-for="post in  posts" :key="post.anuncio" class="js-table-sections">
+          <tbody  v-for="post in  filterArray" :key="post.anuncio" class="js-table-sections">
         
             <tr>
               <td class="text-center">
-                <button :id="post.anuncio"  class="btn btn-sm btn-alt-success" @click.prevent="check(post.anuncio)" type="button" >+Info</button>
+                <button :id="post.anuncio"  class="btn btn-sm btn-alt-success" @click.prevent="check(post)" type="button" >+Info</button>
               </td>
               <td style="color:red" class="fw-semibold"> {{post.anuncio}}</td>
               <td>
@@ -320,6 +321,9 @@
 import navvv from '@/components/Nav.vue'
 import axios from "axios";
 
+var XLSX = require('xlsx')
+var FileSaver = require('file-saver')
+
 export default {
 name: 'PageN',
 components: {
@@ -328,6 +332,7 @@ navvv,
 return{
   posts:[],
   parametros:[],
+  posts2:[],
   filterField:'',
   Active:'',
   BuscarHabitaciones:'',
@@ -336,7 +341,7 @@ return{
   filterUsado:0, //Segundo Uso o Usado ?
   filterEnConstruccion:0, //En construcción
   filterNueva:0,
-  filterUsado:0,
+  filterUsada:0,
   operacionesPrecio:">=",
   precio:'',
   filterDivisa:'',
@@ -348,9 +353,33 @@ return{
 },
 computed:{
   
+  filterArray(){
+    this.posts2=this.posts;
+
+     return this.posts2.filter((item)=>{
+      return (item.anuncio.toLowerCase().indexOf(this.filterField.toLowerCase())>-1)&&
+      (item.tipo.toLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase())>-1)&&
+      item.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1 &&
+      (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
+      (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
+      (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) ||
+      (((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
+      ||((item.estado=='Segundo Uso') && this.filterUsada)) ||eval(parseInt(this.precio) + this.operacionesPrecio+ parseInt(item.precio2));
+      
+    }) ;
   
+  return this.posts2;
+  }
+
 },
 methods:{
+
+
+
+
+
+
+
 filter(post){
 var show=true;
 //console.log(this.precio !="" && eval(parseInt(this.precio) + this.operacionesPrecio+parseInt(post.precio2)));
@@ -383,13 +412,23 @@ show=eval(parseInt(this.precio) + this.operacionesPrecio+parseInt(post.precio2))
  //|| post.tipo.toLocaleLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase()) > -1 || post.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase()>0));
 },
 check(post){
-if(this.Active==post){
+
+if(this.Active==post.anuncio){
    this.Active='';
-}else{ this.Active=post;}
+}else{ this.Active=post.anuncio;}
 
  console.log(this.Active+"");
 },
+filterPost(posts){
+ 
 
+  return this.posts.filter((item)=>{
+      return (item.anuncio.toLowerCase().indexOf(this.filterField.toLowerCase())>-1)&&
+      (item.tipo.toLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase())>-1)&&
+      item.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1
+    });
+
+} ,
 typeZone(post){
       
       for (let index = 0; index < this.parametros.zonas.length; index++) {
@@ -445,7 +484,33 @@ resetFilter(){
   this.precio='',
   this.filterDivisa='',
   this.zona=''
-}
+},
+downloadExl() {
+                let wb = XLSX.utils.table_to_book(document.getElementById('excel')),
+                    wopts = {
+                        bookType: 'xlsx',
+                        bookSST: false,
+                        type: 'binary'
+                    },
+                    wbout = XLSX.write(wb, wopts);
+ 
+               FileSaver.saveAs(new Blob([this.s2ab(wbout)], {
+                    type: "application/octet-stream;charset=utf-8"
+                                 }), "Formulario de perfil personal.xlsx");
+            },
+            s2ab(s) {
+                if (typeof ArrayBuffer !== 'undefind') {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                } else {
+                    var buf = new Array(s.length);
+                    for (var i = 0; i != s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+              }
+
 },
 async created(){
 
