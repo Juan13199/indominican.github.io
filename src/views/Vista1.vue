@@ -57,15 +57,15 @@
                   <h4 class="block-title ms-4">Estado:</h4>
                   <div class="form-check  form-check-inline">
                     <label class="ms-1">Usada</label>
-                  <input type="checkbox"  class="ms-1" v-on:click="filterEnConstruccion=0 ; filterNueva=0"  v-model="filterUsado"/> 
+                  <input type="checkbox"  class="ms-1"   v-model="filterUsado"/> 
                   <label class="ms-2">Construncción</label>
-                  <input class="ms-1" type="checkbox"  v-on:click="filterUsado=0;filterNueva=0;"  v-model="filterEnConstruccion"/>
+                  <input class="ms-1" type="checkbox"  v-model="filterEnConstruccion"/>
               
                   <label class="ms-2">Nueva</label>
-                  <input type="checkbox"  v-on:click="filterEnConstruccion=0 ; filterUsado=0"  v-model="filterNueva"/>
+                  <input type="checkbox"    v-model="filterNueva"/>
 
                   <label class="ms-2">Segundo Uso</label>
-                  <input type="checkbox"  v-on:click="filterEnConstruccion=0 ; filterUsado=0"  v-model="filterUsada"/>
+                  <input type="checkbox"    v-model="filterUsada"/>
                   </div>
                 </div>
                 <div class="col-12 col-md-2">
@@ -298,31 +298,41 @@
       <ul class="pagination">
         
        
-        <li v-on:click="getDataPagina(1)" class="page-item"
+        <li v-on:click="getDataPagina(1)" class="page-item pe-1"
         :class="{active: paginaActual==1}" aria-current="page">
           <a class="page-link" href="#">|&lt;&lt;</a>
         </li>
-        <li class="page-item ">
+
+        <li class="page-item pe-3">
           <a class="page-link"  v-on:click="getPreviousPage()" href="#" >Previous</a>
         </li>
-        <li v-on:click="getDataPagina(paginaActual)" class="page-item"
+
+
+        <!-- 1 -2 -3 -->
+        <li v-on:click="paginaActual==1?getDataPagina(paginaActual): getDataPagina(paginaActual-1)" class="page-item pe-1"
         :class="{active: paginaActual==pagina}" aria-current="page">
           <a class="page-link" href="#">{{this.paginaActual}}</a>
         </li>
-        <li v-on:click="getDataPagina(paginaActual+1)" class="page-item"
+        
+        <li v-on:click="getDataPagina(paginaActual)" class="page-item "
         :class="{active: paginaActual==pagina}" aria-current="page">
-          <a class="page-link" href="#"  v-if="paginaActual==totalPaginas()">{{this.paginaActual-1}}</a>
+          <a class="page-link" href="#"  v-if="paginaActual==totalPaginas()">{{this.paginaActual+1}}</a>
           <a class="page-link" href="#"  v-else>{{this.paginaActual+1}}</a>
         </li>
-        <li v-on:click="paginaActual==totalPaginas()?getDataPagina(paginaActual-2):getDataPagina(paginaActual+2)" class="page-item"
+
+        <li v-on:click="paginaActual==totalPaginas()?getDataPagina(totalPaginas()):getDataPagina(paginaActual+2)" class="page-item ms-1"
         :class="{active: paginaActual==pagina}" aria-current="page">
-          <a class="page-link" href="#" v-if="paginaActual==totalPaginas()">{{this.paginaActual-2}}</a>
+          <a class="page-link" href="#" v-if="paginaActual==totalPaginas()">{{this.paginaActual+2}}</a>
           <a class="page-link" href="#"  v-else>{{this.paginaActual+2}}</a>
         </li>
-        <li class="page-item">
+
+
+
+        <li class="page-item ms-3">
           <a class="page-link"  v-on:click="getNextPage()" href="#">Next</a>
         </li>
-        <li v-on:click="getDataPagina(this.totalPaginas())" class="page-item"
+
+        <li v-on:click="getDataPagina(this.totalPaginas())" class="page-item ms-1"
         :class="{active: paginaActual==totalPaginas()}" aria-current="page">
           <a class="page-link" href="#">>>|</a>
         </li>
@@ -387,7 +397,7 @@ computed:{
       (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
-      (item.estado==''||((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
+      (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
       ||((item.estado=='Segundo Uso') && this.filterUsada)) && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2));
       
     }) ;
@@ -477,7 +487,7 @@ typeZone(post){
     },
 
 totalPaginas(){
-return Math.ceil(this.posts.length /this.elementosPorPagina)
+return Math.ceil(this.filterArray.length /this.elementosPorPagina)
 },
 getDataPagina(noPagina){
 this.paginaActual=noPagina;
@@ -518,7 +528,8 @@ resetFilter(){
   this.operacionesPrecio="<=",
   this.precio=0,
   this.filterDivisa='',
-  this.zona=''
+  this.zona='',
+  this.paginaActual=1
 },
 downloadExl() {
                 let wb = XLSX.utils.table_to_book(document.getElementById('excel')),
