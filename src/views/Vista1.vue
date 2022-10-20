@@ -102,6 +102,13 @@
                       <option v-for="parametro in parametros.zonas" :key="parametro" :value="parametro.zona">{{parametro.zona}}</option>
                        
                     </select>
+
+                    <select v-model="web" class="form-select mt-3" id="example-select" >
+                      <option value="">Web</option>
+                        <option value="supercasas.com/">SuperCasas.com</option>
+                        <option value="indominicana.com/">Indominicana.com</option>
+                         
+                      </select>
                     <!--
                     <input  v-on:click="getDataPagina(this.paginaActual)" type="button"  class="btn btn-secondary col-md-12  mt-3" value="Buscar"/>-->
                 </div>
@@ -132,12 +139,26 @@
     <!-- END Checkable Table -->
 
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
-    <h2 class="content-heading"> <button class="btn btn-success" @click.prevent = "downloadExl"> Export to Excel </button></h2>  
+    <h2 class="content-heading"> 
+      <vue-excel-xlsx
+        :data="filterArray"
+        :columns="columns"
+        :file-name="'filename'"
+        :file-type="'xls'"
+        :sheet-name="'sheetname'"
+        
+        >
+        <button class="btn btn-success"> Export to Excel </button>
+    </vue-excel-xlsx>
+    <!-- <button class="btn btn-success" @click.prevent = "downloadExl"> Export to Excel </button> -->
+    </h2>  
 
     <div class="block block-rounded">
       <div class="block-header block-header-default">
         <h3 class="block-title">
-          <code>In_Dominican</code>
+          <code v-if="web=='supercasas.com/'">SuperCasas.com</code>
+          <code v-else-if="web=='indominicana.com/'">Indominicana.com</code>
+          <code v-else>SuperCasas.com/Indominicana.com</code>
         </h3>
       </div>
       <div class="block-content">
@@ -264,14 +285,15 @@
              </td>
 
              <td class="fw-semibold ">
-               Uso: 
-               <span class=" text-muted"> {{post.uso}}</span>
-               
+               Cambio  precio: 
+               <span class=" text-muted" v-if="post.cambios[0].precio_anterior==null && post.cambios[0].precio_posterior==null">  No hay cambio</span>
+               <span class="text-muted" v-else><strong>Precio Anterior</strong> {{post.cambios[0].precio_anterior}} <br/>
+                <strong>Precio Posterior</strong> {{post.cambios[0].precio_nuevo}}</span>
              </td>
              <td class="fw-semibold ">
                Cambios : <br/>
-               <span  class=" text-muted"> {{this.typeState(post)}}</span>
-               
+               <span  class=" text-muted"> {{this.typeState(post)}} </span> <br/>
+              
              </td>
            </tr>
 
@@ -363,6 +385,81 @@ components: {
 navvv,
 },data(){
 return{
+  columns : [
+
+                   {
+                        label: "Cambios",
+                        field: "cambios",
+                        dataFormat: this.changueFormat
+                    },
+                      {
+                        label: "Año Publicación",
+                        field: "anno",
+                    },
+                    {
+                        label:"Url",
+                        field:"url",
+                    },
+                    {
+                        label: "Código",
+                        field: "anuncio",
+                    },
+                    {
+                        label: "Tipo",
+                        field: "tipo",
+                      dataFormat: this.typeFormat
+                    },
+                    {
+                        label: "Estado",
+                        field: "estado",
+                      
+                    },
+                    {
+                        label: "Uso",
+                        field: "uso",
+                      
+                    },
+                    {
+                      label: "Anuncio",
+                      field: "nombre",
+                     
+                    },
+                    {
+                      label: "Precio Total ",
+                      field: "precio2",
+                     
+                    },
+                    {
+                      label: "Divisa",
+                      field: "divisa",
+                     
+                    },
+                    {
+                      label: "Precio_m2US$",
+                      field: "precio_m",
+                     
+                    },
+                    {
+                      label: "Nº Habitaciones",
+                      field: "habitaciones",
+                     
+                    },
+                    {
+                      label: "Baños",
+                      field: "bannos",
+                     
+                    },
+                    {
+                      label: "Nº Parking",
+                      field: "parking",
+                     
+                    },
+                    {
+                      label: "Facilidades",
+                      field: "facilidades",
+                     
+                    }
+                  ],
   posts:[],
   parametros:[],
   posts2:[],
@@ -381,7 +478,8 @@ return{
   zona:'',
   elementosPorPagina:30,
   datosPaginados:[],
-   paginaActual:1
+   paginaActual:1,
+   web:''
 }
 },
 computed:{
@@ -398,7 +496,8 @@ computed:{
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
       (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
-      ||((item.estado=='Segundo Uso') && this.filterUsada)) && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2));
+      ||((item.estado=='Segundo Uso') && this.filterUsada)) && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2)) &&
+      ((item.url!='' && this.web=='')||(item.url.toLocaleLowerCase().indexOf(this.web.toLocaleLowerCase())>-1));
       
     }) ;
   
@@ -408,11 +507,18 @@ computed:{
 },
 methods:{
 
-
-
-
-
-
+  changueFormat(value){
+   const i=value.length;
+    return value[0].estado;
+            },
+  typeFormat(value){
+    if(value==1)return "Venta";
+    else if(value==2)  return "Alquiler";
+    else if(value==3) return "Alquiler Amueblado";           
+            },
+  priceFormat(value){
+                return '$ ' + value;
+            },
 
 filter(post){
 var show=true;
@@ -475,6 +581,28 @@ typeZone(post){
       return "Indefinido";
     },
     typeState(post){
+      
+      for (let index = 0; index < this.parametros.estados.length; index++) {
+   
+        if(post.cambios[0].estado.toLocaleLowerCase().indexOf(this.parametros.estados[index].nombre.toLocaleLowerCase())>-1){
+          
+          return this.parametros.estados[index].nombre;
+        }
+      }
+      return "Indefinido";
+    },
+    Date1(post){
+      
+      for (let index = 0; index < this.parametros.estados.length; index++) {
+   
+        if(post.cambios[0].estado.toLocaleLowerCase().indexOf(this.parametros.estados[index].nombre.toLocaleLowerCase())>-1){
+          
+          return this.parametros.estados[index].nombre;
+        }
+      }
+      return "Indefinido";
+    },
+    Date2(post){
       
       for (let index = 0; index < this.parametros.estados.length; index++) {
    

@@ -17,6 +17,7 @@
     "md5": "^2.3.0",
     "vue": "^3.2.37",
     "vue-chart-3": "^3.1.8",
+    "vue-excel-xlsx": "^1.2.2",
     "vue-flatpickr-component": "^9.0.6",
     "vue-plugin-load-script": "^2.1.1",
     "vue-router": "^4.0.3",
