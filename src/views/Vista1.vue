@@ -705,6 +705,8 @@ axios.get('https://rd.eisi.cc/WS/listadoGeneral.php', {
 headers: {
       'Access-Control-Allow-Origin':'*',
       'Access-Control-Allow-Headers':'*',
+      
+      
   }
 }).then(res => {
   
