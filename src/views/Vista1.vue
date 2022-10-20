@@ -44,10 +44,10 @@
                 </div>
                 
                 <div class="col-12 col-md-3">
-                  <input class="form-control" type="date" onkeydown="return false"  @bind="FechaMinima">
+                  <input class="form-control" type="date" min="1980-01-01"   v-model="FechaMinima" >
               </div>
               <div class="col-12 col-md-3">
-                <input class="form-control " type="date" onkeydown="return false"  @bind="FechaMaxima">
+                <input class="form-control " type="date"   v-model="FechaMaxima" >
               </div>
               </div>
 
@@ -66,6 +66,9 @@
 
                   <label class="ms-2">Segundo Uso</label>
                   <input type="checkbox"    v-model="filterUsada"/>
+
+                  <label class="ms-2">Reformado</label>
+                  <input type="checkbox"    v-model="filterReformado"/>
                   </div>
                 </div>
                 <div class="col-12 col-md-2">
@@ -137,10 +140,10 @@
       
 
     <!-- END Checkable Table -->
-
+   <stron>{{this.FechaMinima + this.FechaMaxima}} + {{this.Fechamaxima}}</stron>
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
     <h2 class="content-heading"> 
-      <vue-excel-xlsx
+      <vue-excel-xlsx style="border:0px;"
         :data="filterArray"
         :columns="columns"
         :file-name="'filename'"
@@ -159,6 +162,8 @@
           <code v-if="web=='supercasas.com/'">SuperCasas.com</code>
           <code v-else-if="web=='indominicana.com/'">Indominicana.com</code>
           <code v-else>SuperCasas.com/Indominicana.com</code>
+
+          
         </h3>
       </div>
       <div class="block-content">
@@ -177,7 +182,7 @@
         -->
         <table id="excel" class="js-table-sections table table-hover">
           <thead>
-            <tr>
+            <tr style="with:auto;">
               <th class="text-center" style="width: 10%;">#</th>
               <th style="width: 12%;">Código</th>
               <th style="width: 20%;">Nombre</th>
@@ -472,6 +477,7 @@ return{
   filterEnConstruccion:0, //En construcción
   filterNueva:0,
   filterUsada:0,
+  filterReformado:0,
   operacionesPrecio:"<=",
   precio:0,
   filterDivisa:'',
@@ -479,7 +485,9 @@ return{
   elementosPorPagina:30,
   datosPaginados:[],
    paginaActual:1,
-   web:''
+   web:'',
+   FechaMinima:'',
+   FechaMaxima:'',
 }
 },
 computed:{
@@ -495,9 +503,11 @@ computed:{
       (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
-      (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)||((item.estado=='Nueva') && this.filterNueva)
-      ||((item.estado=='Segundo Uso') && this.filterUsada)) && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2)) &&
-      ((item.url!='' && this.web=='')||(item.url.toLocaleLowerCase().indexOf(this.web.toLocaleLowerCase())>-1));
+      (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada && !this.filterReformado)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)
+      ||((item.estado=='Nueva') && this.filterNueva)||((item.estado=='Segundo Uso' && this.filterUsada))||((item.estado=='Reformado'  && this.filterReformado)) ) 
+      && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2)) &&
+      ((item.url!='' && this.web=='')||(item.url.toLocaleLowerCase().indexOf(this.web.toLocaleLowerCase())>-1)) &&
+      (((parseInt(item.anno)>= parseInt(this.filterDate(this.FechaMinima)) && parseInt(item.anno)<= parseInt(this.filterDate(this.FechaMaxima)) && this.FechaMinima!='' && this.FechaMaxima!=''  ) || ((item.anno!='' || item.anno=='' || item.anno=="N/D") && this.FechaMinima=='' && this.FechaMaxima=='' ) ));
       
     }) ;
   
@@ -507,6 +517,9 @@ computed:{
 },
 methods:{
 
+   filterDate(date) {
+  return date.slice(0, 10);
+},
   changueFormat(value){
    const i=value.length;
     return value[0].estado;
