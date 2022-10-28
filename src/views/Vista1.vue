@@ -142,7 +142,7 @@
     <!-- END Checkable Table -->
   
     <span v-html="this.parametros.estadistica"></span>
-    <div v-if="strings"
+
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
     <h2 class="content-heading"> 
       <vue-excel-xlsx style="border:0px;"
