@@ -140,7 +140,9 @@
       
 
     <!-- END Checkable Table -->
-   <stron>{{this.FechaMinima + this.FechaMaxima}} + {{this.Fechamaxima}}</stron>
+  
+    <span v-html="this.parametros.estadistica"></span>
+    <div v-if="strings"
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
     <h2 class="content-heading"> 
       <vue-excel-xlsx style="border:0px;"
@@ -488,6 +490,7 @@ return{
    web:'',
    FechaMinima:'',
    FechaMaxima:'',
+   strings:[],
 }
 },
 computed:{
@@ -512,7 +515,18 @@ computed:{
     }) ;
   
   return this.posts2;
-  }
+  },
+
+  venta(){
+    
+    return this.strings;
+  },
+  alquiler(){
+
+  },
+  alquilerAmueblado(){
+
+  },
 
 },
 methods:{
@@ -735,6 +749,17 @@ headers: {
 beforeUpdate(){
 
  this.getDataPagina(this.paginaActual);
+ 
+ var arrayDeCadenas = this.parametros.estadistica.split("<BR>");
+   //document.write('<p>La cadena original es: "' + arrayDeCadenas + '"');
+   //document.write('<br>El separador es: "' + separador + '"');
+   //document.write("<br>El array tiene " + arrayDeCadenas.length + " elementos: ");
+
+  //  for (var i=0; i < arrayDeCadenas.length; i++) {
+  //     document.write(arrayDeCadenas[i] + " / ");
+  //  }
+
+   this.strings=arrayDeCadenas;
 }
 }
 </script>

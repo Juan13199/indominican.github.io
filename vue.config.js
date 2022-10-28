@@ -4,7 +4,6 @@ module.exports = {
     ? '/indominican.github.io/'
     : '/',
 
-    devServer:{
-     
-    }
+    
+    
 }
