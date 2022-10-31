@@ -142,6 +142,9 @@
     <!-- END Checkable Table -->
   
     <span v-html="this.parametros.estadistica"></span>
+    <span> {{venta}}</span>
+    <span> {{venta}}</span>
+    <span> {{venta}}</span>
 
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
     <h2 class="content-heading"> 
@@ -491,6 +494,9 @@ return{
    FechaMinima:'',
    FechaMaxima:'',
    strings:[],
+   ventas:[],
+   alquiler:[],
+   aamueblado:[],
 }
 },
 computed:{
@@ -519,13 +525,26 @@ computed:{
 
   venta(){
     
-    return this.strings;
+    this.ventas= this.strings;
+    return this.strings.filter((item) => {
+    return  (item.toLowerCase().indexOf("venta")>-1);
+  
+  })
   },
   alquiler(){
-
+    this.alquiler= this.strings;
+    return this.alquiler.filter((item) => {
+    return  item.toLowerCase().indexOf("alquiler")>-1;
+  
+  })
   },
   alquilerAmueblado(){
 
+    this.aamueblado= this.strings;
+    return this.aamueblado.filter((item) => {
+    return  item.toLowerCase().indexOf("alquiler amueblado")>-1;
+  
+  })
   },
 
 },
