@@ -7,7 +7,33 @@
     <!-- Checkable Table (.js-table-checkable class is initialized in Helpers.cbTableToolsCheckable()) -->
     <div class=" block-content">
 
-     
+      <span class="block-title">{{this.strings[0]}}</span> <br/>
+  
+      <div class="card-group col-md-12 block block-rounded">
+        <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Precio Venta</h5>
+          <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+          <p class="card-text"> <span v-for="v in venta" :key="v">{{v}} US$ <br/></span></p>
+        </div>
+        </div>
+
+        <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Precio Alquiler</h5>
+          <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+          <p class="card-text">  <span v-for="v in alquileres" :key="v">{{v}} US$ <br/></span></p>
+        </div>
+        </div>
+
+        <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Precio Alquiler Amueblado</h5>
+          <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+          <p class="card-text">  <span v-for="v in alquilerAmueblados" :key="v">{{v}} US$ <br/></span></p>
+        </div>
+        </div>
+      </div>
       <div class="block block-rounded  block-rounded block-header-default">
         <div class="block block-rounded">
           <!-- Grid Based -->
@@ -137,14 +163,16 @@
         </div>
         </div>
       
-      
+     
 
     <!-- END Checkable Table -->
-  
-    <span v-html="this.parametros.estadistica"></span>
-    <span> {{venta}}</span>
-    <span> {{venta}}</span>
-    <span> {{venta}}</span>
+
+     
+      
+      
+   
+    <!-- <span v-html="this.parametros.estadistica"></span>-->
+   
 
     <!-- Table Sections (.js-table-sections class is initialized in Helpers.cbTableToolsSections()) -->
     <h2 class="content-heading"> 
@@ -440,6 +468,11 @@ return{
                      
                     },
                     {
+                      label: "Metros ",
+                      field: "terreno",
+                     
+                    },
+                    {
                       label: "Divisa",
                       field: "divisa",
                      
@@ -531,14 +564,14 @@ computed:{
   
   })
   },
-  alquiler(){
+  alquileres(){
     this.alquiler= this.strings;
     return this.alquiler.filter((item) => {
-    return  item.toLowerCase().indexOf("alquiler")>-1;
+    return  (item.toLowerCase().indexOf("alquiler en")>-1);
   
   })
   },
-  alquilerAmueblado(){
+  alquilerAmueblados(){
 
     this.aamueblado= this.strings;
     return this.aamueblado.filter((item) => {
