@@ -108,6 +108,11 @@
                           <option value="2">2</option>
                           <option value="3">3 o más</option>
                     </select>
+
+                    <select v-model="cambio" class="form-select mt-3" id="example-select" >
+                      <option value="">Cambios</option>
+                        <option v-for="parametro in parametros.estados" :key="parametro" :value="parametro.nombre">{{parametro.nombre}}</option>
+                      </select>
                   </div>
                 </div>
               
@@ -121,16 +126,20 @@
                           <option value="<="> Mayor a </option>
                          
                     </select>
+  
                   </div>
                     <input v-model="precio" type="number" class="form-control" placeholder="Precio"/>
                   </div>
                 </div>
                 <div class="col-12 col-md-2">
-                  <select v-model="zona" class="form-select" id="example-select" >
-                    <option value="">Zona</option>
-                      <option v-for="parametro in parametros.zonas" :key="parametro" :value="parametro.zona">{{parametro.zona}}</option>
-                       
-                    </select>
+                 
+                  <select v-model="filterDivisa" class="form-select" id="example-select" >
+                    <option value="">Divisa</option>
+                    
+                        <option value="US$"> US$ </option>
+                        
+                        <option value="RD$"> RD$ </option>
+                  </select>
 
                     <select v-model="web" class="form-select mt-3" id="example-select" >
                       <option value="">Web</option>
@@ -142,14 +151,13 @@
                     <input  v-on:click="getDataPagina(this.paginaActual)" type="button"  class="btn btn-secondary col-md-12  mt-3" value="Buscar"/>-->
                 </div>
                 <div class="col-12 col-md-2">
-                  <select v-model="filterDivisa" class="form-select" id="example-select" >
-                    <option value="">Divisa</option>
-                    
-                        <option value="US$"> US$ </option>
-                        
-                        <option value="RD$"> RD$ </option>
-                  </select>
 
+                  <select v-model="zona" class="form-select" id="example-select" >
+                    <option value="">Zona</option>
+                      <option v-for="parametro in parametros.zonas" :key="parametro" :value="parametro.zona">{{parametro.zona}}</option>
+                       
+                    </select>
+                  
                   <input  v-on:click="resetFilter()" type="button"  class="btn btn-danger col-md-12  mt-3" value="Reset"/>
                   
                 </div>
@@ -218,11 +226,13 @@
             <tr style="with:auto;">
               <th class="text-center" style="width: 10%;">#</th>
               <th style="width: 12%;">Código</th>
+              <th style="width: 3%;">Año de construcción</th>
+              <th style="width: 3%;">Metros Construidos</th>
               <th style="width: 20%;">Nombre</th>
               <th style="width: 20%;">Zona</th>
-              <th style="width: 10%;">Tipo</th>
+              <th style="width: 9%;">Tipo</th>
               <th class="d-none d-sm-table-cell" style="width: 11%;">Precio</th>
-              <th style="width: 20%;">Sitio Web</th>
+              <th style="width: 18%;">Sitio Web</th>
             </tr>
           </thead>
           
@@ -232,7 +242,10 @@
               <td class="text-center">
                 <button :id="post.anuncio"  class="btn btn-sm btn-alt-success" @click.prevent="check(post)" type="button" >+Info</button>
               </td>
+             
               <td style="color:red" class="fw-semibold"> {{post.anuncio}}</td>
+              <td><span class="badge bg-primary">{{post.anno}}</span></td>
+              <td><span class="fw-semibold">{{post.construccion}}</span></td>
               <td>
                 <span class="badge bg-primary">{{post.nombre}}</span>
               </td>
@@ -261,14 +274,14 @@
             <template id="datosExtra" v-if="Active==post.anuncio">
             <tr>
              
-              <td class="fw-semibold ">Aseos:<br/> {{post.bannos}}</td>
-
-              <td class="d-none d-sm-table-cell fw-semibold"> 
+              <td  class="fw-semibold ">Aseos:<br/> {{post.bannos}}</td>
+              <td></td>
+              <td  class="d-none d-sm-table-cell fw-semibold"> 
                 Uso :
                 <span v-if="post.uso!=''" class=" text-muted"> {{post.uso}}</span>
                 <span v-else class=" text-muted"> Indefinido</span>
               </td>
-
+              <td></td>
               <td class="text-justify"> 
                <span class="fw-semibold">Facilidades:</span> 
                 <span  v-if="post.facilidades!=''"> {{post.facilidades}}</span> 
@@ -530,6 +543,7 @@ return{
    ventas:[],
    alquiler:[],
    aamueblado:[],
+   cambio:''
 }
 },
 computed:{
@@ -549,6 +563,7 @@ computed:{
       ||((item.estado=='Nueva') && this.filterNueva)||((item.estado=='Segundo Uso' && this.filterUsada))||((item.estado=='Reformado'  && this.filterReformado)) ) 
       && (this.precio!=null && eval(this.precio + this.operacionesPrecio + item.precio2)) &&
       ((item.url!='' && this.web=='')||(item.url.toLocaleLowerCase().indexOf(this.web.toLocaleLowerCase())>-1)) &&
+      (item.cambios[0].estado.toLocaleLowerCase().indexOf(this.cambio.toLocaleLowerCase())>-1)&&
       (((parseInt(item.anno)>= parseInt(this.filterDate(this.FechaMinima)) && parseInt(item.anno)<= parseInt(this.filterDate(this.FechaMaxima)) && this.FechaMinima!='' && this.FechaMaxima!=''  ) || ((item.anno!='' || item.anno=='' || item.anno=="N/D") && this.FechaMinima=='' && this.FechaMaxima=='' ) ));
       
     }) ;
