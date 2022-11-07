@@ -244,7 +244,10 @@
               </td>
              
               <td style="color:red" class="fw-semibold"> {{post.anuncio}}</td>
-              <td><span class="badge bg-primary">{{post.anno}}</span></td>
+              <td>
+                <span v-if="post.anno!=''" class="badge bg-primary">{{post.anno}}</span>
+                <span v-else class="badge bg-primary">N/D</span>
+              </td>
               <td><span class="fw-semibold">{{post.construccion}}</span></td>
               <td>
                 <span class="badge bg-primary">{{post.nombre}}</span>
