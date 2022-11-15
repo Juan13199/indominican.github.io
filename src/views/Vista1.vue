@@ -148,10 +148,12 @@
                         <option value="RD$"> RD$ </option>
                   </select>
 
-                    <select v-model="web" class="form-select mt-3" id="example-select" >
-                      <option value="">Web</option>
-                        <option value="supercasas.com/">SuperCasas.com</option>
-                        <option value="indominicana.com/">Indominicana.com</option>
+                    <select v-model="parking" class="form-select mt-3" id="example-select" >
+                      <option value="">Parking</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
                          
                       </select>
                     <!--
@@ -557,7 +559,8 @@ return{
    ventas:[],
    alquiler:[],
    aamueblado:[],
-   cambio:''
+   cambio:'',
+   parking:''
 }
 },
 computed:{
@@ -569,7 +572,8 @@ computed:{
      return this.posts2.filter((item)=>{
       return (item.anuncio.toLowerCase().indexOf(this.filterField.toLowerCase())>-1)&&
       (item.tipo.toLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase())>-1)&&
-      item.habitaciones.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1 &&
+      (item.habitaciones.toLocaleLowerCase().indexOf(this.parking.toLocaleLowerCase())>-1 )&&
+      (item.parking.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1) &&
       (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
