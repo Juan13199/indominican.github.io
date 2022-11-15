@@ -119,7 +119,7 @@
                 <div class="col-12 col-md-3">
                   <div class="input-group">
                     <div class="col-md-6">
-                    <select v-model="operacionesPrecio" class="form-select" id="example-select" >
+                    <select v-model="operacionesPrecio" class="form-select" id="example-select2" >
                       <option value="==">=</option>
                       
                           <option value=">="> Menor a </option>
@@ -130,6 +130,13 @@
                   </div>
                     <input v-model="precio" type="number" class="form-control" placeholder="Precio"/>
                   </div>
+
+                  <select v-model="web" class="form-select mt-3" id="example-select" >
+                    <option value="">Sitio Web</option>
+                      <option value="supercasas.com/">SuperCasas.com</option>
+                      <option value="indominicana.com/">Indominicana.com</option>
+                       
+                    </select>
                 </div>
                 <div class="col-12 col-md-2">
                  
@@ -429,7 +436,6 @@
 <script>
 import navvv from '@/components/Nav.vue'
 import axios from "axios";
-
 var XLSX = require('xlsx')
 var FileSaver = require('file-saver')
 
@@ -484,8 +490,13 @@ return{
                      
                     },
                     {
-                      label: "Metros ",
+                      label: "Metros Totales ",
                       field: "terreno",
+                     
+                    },
+                    {
+                      label: "Metros Construidos ",
+                      field: "construccion",
                      
                     },
                     {
@@ -785,7 +796,7 @@ downloadExl() {
 },
 async created(){
 
-axios.get('https://rd.eisi.cc/WS/listadoGeneral.php', {
+axios.get('http://rd.eisi.cc/WS/listadoGeneral.php', {
 headers: {
       'Access-Control-Allow-Origin':'*',
       'Access-Control-Allow-Headers':'*',
@@ -801,7 +812,7 @@ headers: {
   console.log(err.response);
 }); 
 
-axios.get('https://rd.eisi.cc/WS/parametros.php', {
+axios.get('http://rd.eisi.cc/WS/parametros.php', {
 headers: {
       'Access-Control-Allow-Origin':'*',
       'Access-Control-Allow-Headers':'*',
