@@ -5,7 +5,7 @@ module.exports = {
     ? '/indominican.github.io/'
     : '/',
 
-  /*   devServer: {
+  /*    devServer: {
       https: {
         https:true,
         key:  fs.readFileSync('./certs/Lets_Encrypt_rd.eisi.cc.pem'),
@@ -13,6 +13,6 @@ module.exports = {
         public: 'https://localhost:8080/'
       },
      
-  } */
+  } */ 
     
 }

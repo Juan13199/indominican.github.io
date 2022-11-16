@@ -153,7 +153,7 @@
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
-                        <option value="4">4</option>
+                        <option value="4">4 o más</option>
                          
                       </select>
                     <!--
@@ -277,7 +277,8 @@
                 {{post.precio}}
               </td>
               <td class="d-none d-sm-table-cell">
-                <button class="btn btn-sm btn-alt-info" ><a target="_blank" :href="post.url">Go -></a> </button>
+                <button v-if="post.cambios[0].estado=='No disponible' "  class="btn btn-sm btn-danger">No Disponible</button>
+                <button v-else class="btn btn-sm btn-alt-info" ><a target="_blank" :href="post.url">Go -></a> </button> 
               </td>
             </tr>
 
@@ -286,7 +287,10 @@
             <template id="datosExtra" v-if="Active==post.anuncio">
             <tr>
              
-              <td  class="fw-semibold ">Aseos:<br/> {{post.bannos}}</td>
+              <td colspan="2" class="fw-semibold ">Aseos:<br/> 
+                <span v-if="post.bannos.toLocaleLowerCase().indexOf('+')>-1" class=" text-muted"> {{post.bannos}} (auxiliar)</span>
+                <span v-else class=" text-muted"> {{post.bannos}}</span>
+              </td>
               <td></td>
               <td  class="d-none d-sm-table-cell fw-semibold"> 
                 Uso :
@@ -489,7 +493,7 @@ return{
                     {
                       label: "Precio Total ",
                       field: "precio2",
-                     
+                      dataFormat: this.formatNumber
                     },
                     {
                       label: "Metros Totales ",
@@ -509,7 +513,7 @@ return{
                     {
                       label: "Precio_m2US$",
                       field: "precio_m",
-                     
+                      dataFormat: this.formatNumber
                     },
                     {
                       label: "Nº Habitaciones",
@@ -572,9 +576,11 @@ computed:{
      return this.posts2.filter((item)=>{
       return (item.anuncio.toLowerCase().indexOf(this.filterField.toLowerCase())>-1)&&
       (item.tipo.toLowerCase().indexOf(this.BuscarTipo.toLocaleLowerCase())>-1)&&
-      (item.habitaciones.toLocaleLowerCase().indexOf(this.parking.toLocaleLowerCase())>-1 )&&
-      (item.parking.toLocaleLowerCase().indexOf(this.BuscarHabitaciones.toLocaleLowerCase())>-1) &&
-      (item.bannos.toLocaleLowerCase().indexOf(this.BuscarBannos)>-1)&&
+      (((item.habitaciones=="" || item.habitaciones!="") && (this.BuscarHabitaciones=="") )|| ((this.BuscarHabitaciones=='1' || this.BuscarHabitaciones=='2' )&& parseInt(this.BuscarHabitaciones)==parseInt(item.habitaciones)) || (this.BuscarHabitaciones=='3' && parseInt(item.habitaciones)>=3 )) &&
+      (((item.parking=="" || item.parking!="") && (this.parking=="") )|| ((this.parking=='1' || this.parking=='2'||this.parking=='3')&& parseInt(this.parking)==parseInt(item.parking)) || (this.parking=='4' && parseInt(item.parking)>=4 )) &&
+
+      (((item.bannos=="" || item.bannos!="") && (this.BuscarBannos=="") )|| ((this.BuscarBannos=='1' || this.BuscarBannos=='2')&& parseInt(this.BuscarBannos)==parseInt(item.bannos)) || (this.BuscarBannos=='3' && parseInt(item.bannos)>=3)) &&
+   
       (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
       (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada && !this.filterReformado)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)
@@ -616,6 +622,12 @@ computed:{
 },
 methods:{
 
+   formatNumber(number) {
+    const exp = /(\d)(?=(\d{3})+(?!\d))/g;
+  const rep = '$1,';
+  return number.toString().replace(exp,rep);
+
+},
    filterDate(date) {
   return date.slice(0, 10);
 },
@@ -739,7 +751,7 @@ let fin=(noPagina* this.elementosPorPagina);
  this.datosPaginados= this.filterArray.slice(ini,fin);
 for (let index = 0; index < this.datosPaginados.length; index++) {
 var element = this.datosPaginados[index];
-console.log(element+"");
+//console.log(element+"");
 }
 
 
@@ -769,7 +781,14 @@ resetFilter(){
   this.precio=0,
   this.filterDivisa='',
   this.zona='',
-  this.paginaActual=1
+  this.paginaActual=1,
+  this.filterReformado='',
+  this.filterUsada='',
+  this.web='',
+  this.cambio='',
+  this.FechaMinima='',
+   this.FechaMaxima='',
+   this.parking=''
 },
 downloadExl() {
                 let wb = XLSX.utils.table_to_book(document.getElementById('excel')),
@@ -799,8 +818,8 @@ downloadExl() {
 
 },
 async created(){
-
-axios.get('http://rd.eisi.cc/WS/listadoGeneral.php', {
+  
+axios.get('https://rd.eisi.cc/WS/listadoGeneral.php', {
 headers: {
       'Access-Control-Allow-Origin':'*',
       'Access-Control-Allow-Headers':'*',
@@ -816,7 +835,7 @@ headers: {
   console.log(err.response);
 }); 
 
-axios.get('http://rd.eisi.cc/WS/parametros.php', {
+axios.get('https://rd.eisi.cc/WS/parametros.php', {
 headers: {
       'Access-Control-Allow-Origin':'*',
       'Access-Control-Allow-Headers':'*',
