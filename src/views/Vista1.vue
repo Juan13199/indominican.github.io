@@ -493,7 +493,7 @@ return{
                     {
                       label: "Precio Total ",
                       field: "precio2",
-                      dataFormat: this.formatNumber
+                     
                     },
                     {
                       label: "Metros Totales ",
@@ -513,7 +513,7 @@ return{
                     {
                       label: "Precio_m2US$",
                       field: "precio_m",
-                      dataFormat: this.formatNumber
+                     
                     },
                     {
                       label: "Nº Habitaciones",
