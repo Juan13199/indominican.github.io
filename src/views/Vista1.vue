@@ -433,10 +433,8 @@
       
     </div>
     <!-- END Table Sections -->
-    <i v-for="parametro in parametros.zonas" :key="parametro" :value="parametro.zona">{{parametro.zona}} <br></i>
+   
   </div>
- 
-
 
 <!-- END Footer -->
 </template>
@@ -620,14 +618,6 @@ computed:{
   
   })
   },
-   precioAlquilerM2(){
-    var precioAlquiler= this.posts;
-    let zona=['Piantini','La Esperilla','La Julia','Naco','Paraíso','Piantini'];
-   /*   precioAlquiler.filer(()=>{
-
-    })  */
-    return zona;
-  }, 
 
 },
 methods:{
@@ -861,7 +851,6 @@ headers: {
 
 },
 beforeUpdate(){
-
 
  this.getDataPagina(this.paginaActual);
  
