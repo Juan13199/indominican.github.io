@@ -10,28 +10,50 @@
       <span class="block-title">{{this.strings[0]}}</span> <br/>
   
       <div class="card-group col-md-12 block block-rounded">
+        <!-- <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Precio Venta</h5>
+            <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+            <p class="card-text"> <span v-for="v in venta" :key="v">{{v}} US$ <br/></span></p>
+          </div>
+        </div> -->
         <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Precio Venta</h5>
-          <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
-          <p class="card-text"> <span v-for="v in venta" :key="v">{{v}} US$ <br/></span></p>
-        </div>
+          <div class="card-body">
+            <h5 class="card-title">Precio Venta</h5>
+            <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+            <p class="card-text"> <span v-for="v in parametros.zonas" :key="v"> Venta en {{v.zona}} :{{Math.trunc(precioAlquilerM2(v.zona,1)) }} US$ <br/></span></p>
+          </div>
         </div>
 
-        <div class="card">
+     <!--    <div class="card">
         <div class="card-body">
           <h5 class="card-title">Precio Alquiler</h5>
           <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
           <p class="card-text">  <span v-for="v in alquileres" :key="v">{{v}} US$ <br/></span></p>
         </div>
-        </div>
-
+        </div> -->
+        
         <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Precio Alquiler Amueblado</h5>
-          <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
-          <p class="card-text">  <span v-for="v in alquilerAmueblados" :key="v">{{v}} US$ <br/></span></p>
-        </div>
+          <div class="card-body">
+            <h5 class="card-title">Precio Alquiler</h5>
+            <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+            <p class="card-text">  <span v-for="v in parametros.zonas" :key="v"> Alquiler en {{v.zona}} :{{Math.trunc(precioAlquilerM2(v.zona,2)) }} US$ <br/></span></p>
+          </div>
+          </div>
+
+        <!-- <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Precio Alquiler Amueblado</h5>
+            <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+            <p class="card-text">  <span v-for="v in alquilerAmueblados" :key="v">{{v}} US$ <br/></span></p>
+          </div>
+        </div> -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Precio Alquiler Amueblado</h5>
+            <h6 class="card-subtitle mb-2 text-muted"> <span>{{this.strings[1]}}</span></h6>
+            <p class="card-text">  <span v-for="v in parametros.zonas" :key="v"> Alquiler Amueblado en {{v.zona}} :{{Math.trunc(precioAlquilerM2(v.zona,3)) }} US$ <br/></span></p>
+          </div>
         </div>
       </div>
       <div class="block block-rounded  block-rounded block-header-default">
@@ -184,8 +206,6 @@
 
     <!-- END Checkable Table -->
 
-     
-      
       
    
     <!-- <span v-html="this.parametros.estadistica"></span>-->
@@ -619,6 +639,7 @@ computed:{
   })
   },
 
+
 },
 methods:{
 
@@ -643,6 +664,24 @@ methods:{
   priceFormat(value){
                 return '$ ' + value;
             },
+
+    //Metodo Alquiler         
+precioAlquilerM2(zone,tipo){
+
+var sumAlquiler=this.posts;
+var sumAlquilerEsperilla=sumAlquiler.filter((item)=>{
+  return (item.nombre.toLocaleLowerCase().indexOf(zone.toLocaleLowerCase())>-1) &&
+    item.tipo==tipo && item.divisa.toLocaleLowerCase()=='US$'.toLocaleLowerCase() &&
+   ( parseInt(item.precio_m) !=0);
+});
+
+var totalEsperilla= sumAlquilerEsperilla.reduce((a,b) => {
+  return a+ (Number(b['precio_m']));
+},0);
+
+return  totalEsperilla=totalEsperilla/sumAlquilerEsperilla.length;
+
+},
 
 filter(post){
 var show=true;
