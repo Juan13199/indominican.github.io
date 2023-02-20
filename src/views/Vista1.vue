@@ -513,6 +513,7 @@ return{
                     {
                       label: "Precio Total ",
                       field: "precio2",
+                      dataFormat :this.precioTotalFormat
                      
                     },
                     {
@@ -584,7 +585,8 @@ return{
    alquiler:[],
    aamueblado:[],
    cambio:'',
-   parking:''
+   parking:'',
+   listExcel:[]
 }
 },
 computed:{
@@ -613,6 +615,10 @@ computed:{
     }) ;
   
   return this.posts2;
+  },
+
+  exportExcelArray(){
+    
   },
 
   venta(){
@@ -664,6 +670,9 @@ methods:{
   priceFormat(value){
                 return '$ ' + value;
             },
+   precioTotalFormat(value){
+    return parseInt(value);
+   }      , 
 
     //Metodo Alquiler         
 precioAlquilerM2(zone,tipo){
@@ -671,7 +680,7 @@ precioAlquilerM2(zone,tipo){
 var sumAlquiler=this.posts;
 var sumAlquilerEsperilla=sumAlquiler.filter((item)=>{
   return (item.nombre.toLocaleLowerCase().indexOf(zone.toLocaleLowerCase())>-1) &&
-    item.tipo==tipo && item.divisa.toLocaleLowerCase()=='US$'.toLocaleLowerCase() &&
+    item.tipo==tipo &&  parseInt(item.precio2) < 1500000  && item.divisa=="US$"  && parseInt(item.construccion)!=0 && item.construccion!="" &&  item.cambios[0].estado!="No disponible" &&
    ( parseInt(item.precio_m) !=0);
 });
 
