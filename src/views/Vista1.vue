@@ -481,6 +481,7 @@ return{
                       {
                         label: "Año Publicación",
                         field: "anno",
+                        
                     },
                     {
                         label:"Url",
@@ -489,6 +490,7 @@ return{
                     {
                         label: "Código",
                         field: "anuncio",
+                        dataFormat :this.precioTotalFormat
                     },
                     {
                         label: "Tipo",
@@ -508,6 +510,7 @@ return{
                     {
                       label: "Anuncio",
                       field: "nombre",
+                      
                      
                     },
                     {
@@ -519,11 +522,13 @@ return{
                     {
                       label: "Metros Totales ",
                       field: "terreno",
+                      dataFormat :this.precioTotalFormat
                      
                     },
                     {
                       label: "Metros Construidos ",
                       field: "construccion",
+                      dataFormat :this.precioTotalFormat
                      
                     },
                     {
@@ -544,6 +549,7 @@ return{
                     {
                       label: "Baños",
                       field: "bannos",
+                      dataFormat :this.precioTotalFormat
                      
                     },
                     {
@@ -603,7 +609,7 @@ computed:{
 
       (((item.bannos=="" || item.bannos!="") && (this.BuscarBannos=="") )|| ((this.BuscarBannos=='1' || this.BuscarBannos=='2')&& parseInt(this.BuscarBannos)==parseInt(item.bannos)) || (this.BuscarBannos=='3' && parseInt(item.bannos)>=3)) &&
    
-      (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase())>-1)&&
+      (item.nombre.toLocaleLowerCase().indexOf(this.zona.toLocaleLowerCase()+",")>-1)&&
       (item.divisa.toLocaleLowerCase().indexOf(this.filterDivisa.toLocaleLowerCase())>-1) &&
       (((item.estado=='' ||item.estado!="") && ( !this.filterUsado && !this.filterEnConstruccion && !this.filterNueva && !this.filterUsada && !this.filterReformado)) || ((item.estado=='Usado') && this.filterUsado)||((item.estado=='En construcción')&& this.filterEnConstruccion)
       ||((item.estado=='Nueva') && this.filterNueva)||((item.estado=='Segundo Uso' && this.filterUsada))||((item.estado=='Reformado'  && this.filterReformado)) ) 
@@ -671,6 +677,9 @@ methods:{
                 return '$ ' + value;
             },
    precioTotalFormat(value){
+    if(value==""){
+      return 0;
+    }
     return parseInt(value);
    }      , 
 
@@ -678,12 +687,25 @@ methods:{
 precioAlquilerM2(zone,tipo){
 
 var sumAlquiler=this.posts;
+if(tipo=="1"){
+  var sumAlquilerEsperilla=sumAlquiler.filter((item)=>{
+  return (item.nombre.toLocaleLowerCase().indexOf(zone.toLocaleLowerCase())>-1) &&
+    item.tipo==tipo && parseInt(item.precio2) > 50000 &&  parseInt(item.precio2) < 1500000     && item.divisa=="US$"  && parseInt(item.construccion)!=0 && item.construccion!="" &&  item.cambios[0].estado!="No disponible" &&
+   ( parseInt(item.precio_m) !=0);
+});}
+else if (tipo=="3"){
 var sumAlquilerEsperilla=sumAlquiler.filter((item)=>{
+  return (item.nombre.toLocaleLowerCase().indexOf(zone.toLocaleLowerCase())>-1) &&
+    item.tipo==tipo && parseInt(item.precio2) < 50000  &&  parseInt(item.precio2) < 1500000  && item.divisa=="US$"  && parseInt(item.construccion)!=0 && item.construccion!="" &&  item.cambios[0].estado!="No disponible" &&
+   ( parseInt(item.precio_m) !=0);
+});
+}else{
+  var sumAlquilerEsperilla=sumAlquiler.filter((item)=>{
   return (item.nombre.toLocaleLowerCase().indexOf(zone.toLocaleLowerCase())>-1) &&
     item.tipo==tipo &&  parseInt(item.precio2) < 1500000  && item.divisa=="US$"  && parseInt(item.construccion)!=0 && item.construccion!="" &&  item.cambios[0].estado!="No disponible" &&
    ( parseInt(item.precio_m) !=0);
 });
-
+}
 var totalEsperilla= sumAlquilerEsperilla.reduce((a,b) => {
   return a+ (Number(b['precio_m']));
 },0);
@@ -817,7 +839,7 @@ if(this.paginaActual < this.totalPaginas()){
 this.getDataPagina(this.paginaActual);
 } ,
 resetFilter(){
-  this.filterField='',
+/*   this.filterField='',
   this.Active='',
   this.BuscarHabitaciones='',
   this.BuscarBannos='',
@@ -836,7 +858,8 @@ resetFilter(){
   this.cambio='',
   this.FechaMinima='',
    this.FechaMaxima='',
-   this.parking=''
+   this.parking='', */
+   location.reload();
 },
 downloadExl() {
                 let wb = XLSX.utils.table_to_book(document.getElementById('excel')),
